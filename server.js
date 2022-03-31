@@ -2,12 +2,38 @@ import express from "express";
 
 const app = express();
 
+const users = [
+    {
+        id: 1,
+        name: 'John',
+        profile: {
+            address1: 'address 1',
+            address2: 'address 2'
+        }
+    },
+    {
+        id: 2,
+        name: 'Doe',
+        profile: {
+            address1: 'address 3',
+            address2: 'address 4'
+        }
+    },
+    {
+        id: 3,
+        name: 'mark',
+        profile: {
+            address1: 'address 5',
+            address2: 'address 6'
+        }
+    }
+]
+
 app.post('/', (req, res) => {
     console.log("POST request")
 })
 
 app.get('/', (req, res) => {
-    console.log(Date());
     res.send("GET request")
 })
 
@@ -20,7 +46,7 @@ app.delete('/', (req, res) => {
 })
 
 app.patch('/', (req, res) => {
-    
+
 })
 
 app.listen(3000, () => {
