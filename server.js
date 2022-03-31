@@ -32,7 +32,8 @@ const users = [
 ]
 
 app.post('/', (req, res) => {
-    console.log("POST request")
+    users.push(req.body)
+    res.send(req.body)
 })
 
 app.get('/', (req, res) => {
