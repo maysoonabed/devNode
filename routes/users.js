@@ -1,8 +1,9 @@
 import express from 'express';
 const router = express.Router()
 import User from '../models/User.js'
+import createUserValidator from './createUserValidator.js'
 
-router.post('/', async (req, res) => {
+router.post('/', createUserValidator, async (req, res) => {
     const { email, password } = req.body
     const user = await User.create({ email, password })
     res.send(user)
@@ -13,14 +14,15 @@ router.get('/', async (req, res) => {
     return res.send(users)
 })
 
-router.get('/:id', async (req, res) => {
-    // const user = await User.findOne({ _id: req.params.id })
-    const user = await User.findById(req.id)
-    return res.send(user)
-})
+router.get('/:id'
+    , async (req, res) => {
+        const user = await User.findOne({ _id: req.params.id })
+        // const user = await User.findById(req.id)
+        return res.send(user)
+    })
 
-router.put('/:id', async (req, res) => {
-    
+router.put('/:id', createUserValidator, async (req, res) => {
+    res.send(req.body)
 })
 
 router.delete('/:id', async (req, res) => {
