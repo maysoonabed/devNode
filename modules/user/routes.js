@@ -10,9 +10,11 @@ router.post('/login', controller.login)
 
 router.get('/', controller.find)
 
-router.get('/:id', controller.findById)
-
 router.use(authenticationMiddleware)
+
+router.get('/likes', controller.findUserLikes)
+
+router.get('/:id', controller.findById)
 
 router.put('/:id', createUserValidator, controller.update)
 

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import paginate from 'mongoose-paginate-v2'
 
 const contentSchema = new mongoose.Schema({
     content: { type: String, required: true },
@@ -7,6 +8,8 @@ const contentSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
+
+contentSchema.plugin(paginate)
 
 contentSchema.static.findByUser = async function (user_id) {
     /**

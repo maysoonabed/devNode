@@ -7,7 +7,7 @@ export const create = async (req, res) => {
 }
 
 export const find = async (req, res) => {
-    const posts = await service.find()
+    const posts = await service.find(req.query)
     return res.send(posts)
 }
 
