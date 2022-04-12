@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import paginate from 'mongoose-paginate-v2'
+import mongoose_delete from 'mongoose-delete'
 
 const contentSchema = new mongoose.Schema({
     content: { type: String, required: true },
@@ -10,6 +11,9 @@ const contentSchema = new mongoose.Schema({
 })
 
 contentSchema.plugin(paginate)
+contentSchema.plugin(mongoose_delete, { deletedAt: true, deletedBy: true })
+contentSchema.plugin(mongoose_delete, { overrideMethods: ['find', 'count', 'countDocuments', 'findOne', 'findOneAndUpdate', 'update'] })
+
 
 contentSchema.static.findByUser = async function (user_id) {
     /**

@@ -19,7 +19,7 @@ export const findById = async (req, res) => {
 
 export const remove = async (req, res) => {
     const result = await service.remove({ post_id: req.params.id, user_id: req.userId })
-    if (!result.deletedCount) throw new Error(`No post found for ${req.params.id}`)
+    // if (!result.deletedCount) throw new Error(`No post found for ${req.params.id}`)
     return res.status(204).send(result)
 }
 

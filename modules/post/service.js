@@ -13,7 +13,12 @@ export const remove = async ({ post_id, user_id }) => {
     /**
      * we pass user_id to make sure that every user can remove only the posts that belongs to him.
      */
-    return await Post.deleteOne({ post_id, user_id })
+    const post = await Post.findOneWithDeleted({ _id: post_id })
+    if (!post) {
+        throw new Error('No post')
+    }
+    return await post.delete()
+    // return await Post.deleteOne({ post_id, user_id })
 }
 
 export const find = async (query) => {
