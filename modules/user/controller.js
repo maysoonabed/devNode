@@ -1,5 +1,6 @@
 import User from '../../models/User.js'
 import * as service from './service.js'
+import mongoose from 'mongoose'
 
 export const create = async (req, res) => {
     const { email, password, firstName, lastName } = req.body
@@ -20,6 +21,60 @@ export const login = async (req, res) => {
 export const find = async (req, res) => {
     const users = await User.find()
     return res.send(users)
+}
+
+export const findUserLikes = async (req, res) => {
+    const result = await User.aggregate([
+        {
+            $match: {
+                _id: mongoose.Types.ObjectId(req.userId)
+            }
+        },
+        {
+            $project: {
+                password: 0
+            }
+        },
+        {
+            $lookup: {
+                from: 'likes',
+                localField: '_id',
+                foreignField: 'user_id',
+                as: 'like'
+            }
+        },
+        // {
+        //     $addFields: {
+        //         count: { $size: "$like" }
+        //     }
+        // },
+        {
+            $unwind: '$like'
+        },
+        {
+            $lookup: {
+                from: 'contents',
+                localField: 'like.post_id',
+                foreignField: '_id',
+                as: 'post'
+            }
+        },
+        {
+            $unwind: '$post'
+        },
+        {
+            $project: {
+                'like.post_id': 0,
+                'like.user_id': 0,
+                'like.__v': 0,
+                'post.__v': 0
+            }
+        },
+        {
+            $count: 'count'
+        }
+    ])
+    return res.send(result)
 }
 
 export const findById = async (req, res) => {
