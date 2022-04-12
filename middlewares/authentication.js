@@ -17,6 +17,7 @@ export default async (req, res, next) => {
     try {
         const payload = validateToken(token)
         if (payload) {
+            req.userId = payload._id
             return next()
         }
     } catch (e) {
