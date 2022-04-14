@@ -1,6 +1,7 @@
 import { body } from "express-validator";
 import validate from "../../../core/errorMiddleware.js";
 import { findByEmail } from "../service.js";
+
 const rules = [
   body("firstName").isLength({ min: 4, max: 20 }),
   body("lastName").isLength({ min: 4, max: 20 }),
@@ -29,7 +30,14 @@ const rules = [
     ),
   body("date_of_birth")
     .isISO8601()
-    .withMessage("Date of birth should be a valid ISO 8601 date."),
+    .withMessage("Date of birth should be a valid ISO 8601 date.")
+    .bail()
+    .isBefore(
+      new Date(
+        new Date().setFullYear(new Date().getFullYear() - 18)
+      ).toDateString()
+    )
+    .withMessage("Age can't be less than 18"),
 ];
 
 export default validate(rules);
