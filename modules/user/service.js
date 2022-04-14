@@ -79,8 +79,12 @@ export const usersNoLikes = async () => {
       },
     },
     {
-      $unwind: "$likes",
+      $unwind: {
+        path: "$likes",
+        preserveNullAndEmptyArrays: true,
+      },
     },
+
     {
       $sort: { "likes.createdAt": -1 },
     },
@@ -93,7 +97,10 @@ export const usersNoLikes = async () => {
     },
     {
       $match: {
-        createdAt: { $lt: lastMonthFromToday },
+        $or: [
+          { createdAt: { $in: [null, ""] } },
+          { createdAt: { $lte: lastMonthFromToday } },
+        ],
       },
     },
   ]);
