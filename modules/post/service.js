@@ -106,8 +106,49 @@ export const findContentsByTheSameUser = async () => {
   return await post.findContentsByTheSameUser()
 }
 
+import mongoose from 'mongoose'
+import { ApiError } from '../../errors/ApiError.js'
+
 export const like = async ({ post_id, user_id }) => {
-  return await Like.create({ post_id, user_id })
+  const session = await mongoose.startSession()
+  // managed transactions
+  let like
+  await session.withTransaction(async () => {
+    like = await Like.create([{ post_id, user_id }], { session })
+    if (like) {
+      throw ApiError.badRequest('error adding like')
+    }
+    await Post.updateOne({ _id: "post_id" }, { $inc: { likes: 1 } }, { session })
+  })
+  session.endSession()
+  return like
+}
+
+export const like2 = async ({ post_id, user_id }) => {
+  const session = mongoose.startSession()
+  // unmanaged transactions
+  session.startTransaction()
+  try {
+    like = await Like.create({ post_id, user_id }, { session })
+    const result = await Post.updateOne({ _id: post_id }, { $inc: { likes: 1 } }, { session })
+    if (!result.updatedDocuments) {
+      // abort
+    }
+    if (!like) {
+      // abort
+    }
+    await session.commitTransaction()
+  } catch (error) {
+    await session.abortTransaction()
+  }
+
+  let like
+  await session.withTransaction(async () => {
+    like = await Like.create({ post_id, user_id }, { session })
+    await Post.updateOne({ _id: post_id }, { $inc: { views: 1 } }, { session })
+  })
+  session.endSession()
+  return like
 }
 
 export const isLikedBefore = async ({ post_id, user_id }) => {

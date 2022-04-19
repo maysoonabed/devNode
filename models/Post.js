@@ -5,7 +5,8 @@ import mongoose_delete from 'mongoose-delete'
 const contentSchema = new mongoose.Schema({
     content: { type: String, required: true },
     user_id: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-    post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Content' }
+    post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Content' },
+    likes: { type: Number, default: 0 }
 }, {
     timestamps: true
 })

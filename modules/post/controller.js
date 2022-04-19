@@ -28,8 +28,15 @@ export const findContentsByTheSameUser = async (req, res) => {
     return res.send(postsByTheSameUser)
 }
 
-export const like = async (req, res) => {
+export const like = async (req, res, next) => {
     const { id } = req.params
-    const like = await service.like({ post_id: id, user_id: req.userId })
-    res.status(201).send(like)
+    service.like({ post_id: id, user_id: req.userId })
+        .then((result => res.status(201).send(result)))
+        .catch(next)
+    // try {
+    //     const like = await service.like({ post_id: id, user_id: req.userId })
+    //     res.status(201).send(like)
+    // } catch (error) {
+    //     next(error)
+    // }
 }

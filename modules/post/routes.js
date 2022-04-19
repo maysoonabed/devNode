@@ -10,7 +10,7 @@ router.use(authenticationMiddleware)
 
 router.post('/', createPostValidator, controller.create)
 
-router.post('/:id/like', paramIdValidator, createLikeValidator, controller.like)
+router.post('/:id/like', paramIdValidator, controller.like)
 
 router.get('/', controller.find)
 
