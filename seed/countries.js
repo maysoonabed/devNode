@@ -7,7 +7,7 @@ import mongoose from 'mongoose'
 import { ApiError } from '../errors/ApiError.js'
 
 export default async () => {
-    //Sorry the data are way too large for me to keep track of different cases, can't even see the db
+    //Sorry the data are way too large for me to keep track of different cases, can't even take a look at the db
     //how to extend the transaction time limit?
     for (let con of countries) {
         const session = await mongoose.startSession()
