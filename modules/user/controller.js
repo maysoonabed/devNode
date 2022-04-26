@@ -19,7 +19,7 @@ export const login = async (req, res) => {
 }
 
 export const find = async (req, res) => {
-  const users = await User.find()
+  const users = await User.find().lean()
   return res.send(users)
 }
 
@@ -78,7 +78,7 @@ export const findUserLikes = async (req, res) => {
 }
 
 export const findById = async (req, res) => {
-  const user = await User.findOne({ _id: req.params.id })
+  const user = await User.findOne({ _id: req.params.id }).lean()
   // const user = await User.findById(req.id)
   return res.send(user)
 }
