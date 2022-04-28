@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
+import InterAct from './InterAct.js'
 
-const likeSchema = new mongoose.Schema({
-    user_id: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+const likeSchema = InterAct.discriminator('Like', new mongoose.Schema({
     post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Content' }
-}, { timestamps: true })
+}))
 
-export default mongoose.model('Like', likeSchema)
+export default likeSchema

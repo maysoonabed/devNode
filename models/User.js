@@ -8,7 +8,7 @@ const options = {
 
 const schemaUser = new mongoose.Schema({
     email: { type: String, required: true },
-    password: { type: String, required: true, select: false },
+    password: { type: String, required: true },
     firstName: String,
     middleName: String,
     lastName: String,
@@ -20,19 +20,19 @@ schemaUser.post('init', doc => {
     console.log('init has been called');
 })
 
-schemaUser.pre('validate', function () {
+schemaUser.pre('validate', function() {
     if (this._doc.type === 'Admin' && !this._doc.middleName) {
         throw new Error('middle name is required for admin users')
     }
     console.log('pre validate has been called')
 })
 
-schemaUser.post('validate', function () {
+schemaUser.post('validate', function() {
     // validated and ready to be saved
     console.log('post validate has been called')
 })
 
-schemaUser.pre('save', function (next) {
+schemaUser.pre('save', function(next) {
     let fullName = [this.firstName, this.middleName, this.lastName]
         .filter(Boolean)
         .join(' ')
@@ -47,14 +47,14 @@ schemaUser.pre('save', function (next) {
         this.set({ updatedAt: Date.now() })
     }
 
-    if(this.isModified('email')) {
+    if (this.isModified('email')) {
         //
     }
 
     next()
 })
 
-schemaUser.post('save', function (doc, next) {
+schemaUser.post('save', function(doc, next) {
     // send doc to elasticsearch
     console.log("post save has been called")
     if (this.$locals.isNew) {
@@ -63,13 +63,13 @@ schemaUser.post('save', function (doc, next) {
     next()
 })
 
-schemaUser.pre('remove', function (doc, next) {
+schemaUser.pre('remove', function(doc, next) {
     // send doc to elasticsearch
     console.log("pre remove has been called")
     next()
 })
 
-schemaUser.pre('find', function () {
+schemaUser.pre('find', function() {
     // send doc to elasticsearch
     this.setQuery({ deleted: false })
     console.log(this.getQuery())
@@ -77,13 +77,13 @@ schemaUser.pre('find', function () {
     // next()
 })
 
-schemaUser.post('find', function (doc, next) {
+schemaUser.post('find', function(doc, next) {
     // send doc to elasticsearch
     console.log("pre find has been called")
     next()
 })
 
-schemaUser.pre('updateOne', function () {
+schemaUser.pre('updateOne', function() {
     // send doc to elasticsearch
     this.set({ updatedAt: Date.now() })
     console.log("pre updateOne has been called")

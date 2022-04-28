@@ -3,5 +3,5 @@ import Country from '../models/Country.js'
 
 export default async () => {
     // transaction
-    await Country.insertMany(countries)
+      await Country.insertMany(countries)
 }
