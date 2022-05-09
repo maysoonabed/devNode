@@ -12,3 +12,24 @@ export const find = async () => {
   // })
   return await Admin.findOne()
 }
+
+export const findById = async id => {
+  return await Admin.findById(id)
+}
+
+export const sum = (x, y) => {
+  return x + y
+}
+
+export const isEven = x => {
+  return x % 2 === 0
+}
+
+export const fullName = arr => {
+  if (!arr || !Array.isArray(arr)) {
+    throw new Error('invalid argument')
+  }
+  return arr
+    .filter(Boolean)
+    .join(' ')
+}

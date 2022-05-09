@@ -7,7 +7,7 @@ const options = {
 }
 
 const schemaUser = new mongoose.Schema({
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
     firstName: String,
     middleName: String,
@@ -16,14 +16,14 @@ const schemaUser = new mongoose.Schema({
 }, options)
 
 schemaUser.post('init', doc => {
-    console.log(doc)
+    // console.log(doc)
     console.log('init has been called');
 })
 
 schemaUser.pre('validate', function () {
-    if (this._doc.type === 'Admin' && !this._doc.middleName) {
-        throw new Error('middle name is required for admin users')
-    }
+    // if (this._doc.type === 'Admin' && !this._doc.middleName) {
+    //     throw new Error('middle name is required for admin users')
+    // }
     console.log('pre validate has been called')
 })
 
@@ -47,7 +47,7 @@ schemaUser.pre('save', function (next) {
         this.set({ updatedAt: Date.now() })
     }
 
-    if(this.isModified('email')) {
+    if (this.isModified('email')) {
         //
     }
 
