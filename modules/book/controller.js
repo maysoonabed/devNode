@@ -15,14 +15,6 @@ export const viewBook = async (req, res, next) => {
 }
 export const find = async (req, res) => {
     const { text, ISBN, skip } = req.query
-    const books = await service.searchBook(text, ISBN, skip)
+    const books = await service.searchBook({ text, ISBN, skip })
     return res.send(books)
-}
-
-
-export const viewStory = async (req, res, next) => {
-    const { id } = req.params
-    service.viewStory({ story_id: id, user_id: req.userId })
-        .then((result => res.status(201).send(result)))
-        .catch(next)
 }

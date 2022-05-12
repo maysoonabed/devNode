@@ -12,7 +12,7 @@
 
  }
 
- export const searchBook = async (text, ISBN, skip) => {
+ export const searchBook = async ({ text, ISBN, skip }) => {
      let conds = []
      if (text) conds.push({
          $match: { $text: { $search: text } }

@@ -3,7 +3,7 @@ import aggregatePaginate from "mongoose-aggregate-paginate-v2"
 
 const bookSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    ISBN: { type: String, required: true }, //,  unique: true 
+    ISBN: { type: String, required: true, unique: true },
     book_cover_image: { type: String, required: true },
     author: {
         _id: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Author' },
@@ -13,12 +13,8 @@ const bookSchema = new mongoose.Schema({
     timestamps: true
 })
 
-bookSchema.index({ 'author.fullname': 'text', name: 'text' }, {
-    weights: {
-        'author.fullname': 2,
-        name: 5
-    }
-})
+bookSchema.index({ 'author.fullName': 'text', name: 'text' })
+
 
 bookSchema.plugin(aggregatePaginate)
 export default mongoose.model('Book', bookSchema)

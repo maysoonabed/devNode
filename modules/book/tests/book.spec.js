@@ -1,112 +1,110 @@
-/*import { sum, isEven, fullName, create, findById } from "../service.js"
+import { create, searchBook, viewBook, findByISBN, availableAuthor } from "../service.js"
 import { connect } from '../../../core/mongoMemoryServer.js'
+import { author } from "../../author/tests/author.spec.js"
+import mongoose from 'mongoose'
 
-describe('admin tests', () => {
-    let number
-    let admin = null
+const createError = async ({ name, ISBN, author_id, book_cover_image }) => {
+    let errorMessage
+    try {
+        await create({
+            name,
+            ISBN,
+            author_id,
+            book_cover_image
+        })
+    } catch (error) {
+        errorMessage = error.message;
+    }
+    return errorMessage
+}
+
+describe('book tests', () => {
+    let book = null
     beforeAll(async () => {
         await connect()
-        number = 10
-        jasmine.addMatchers({
-            toBeYoung: () => {
-                return {
-                    compare: (actual, expected) => {
-                        const result = {}
-                        result.pass = actual > 15 && actual < 40
-                        result.message = 'is not young'
+    })
 
-                        return result
-                    }
-                }
-            }
+    it('check author', async () => {
+        let auth2 = await availableAuthor(author._id)
+        expect(auth2.last_name).toBe('elefante')
+    })
+
+    it('create book', async () => {
+        book = await create({
+            name: "book",
+            ISBN: "978-1-4028-9462-6",
+            author_id: author._id,
+            book_cover_image: "https://images.app.goo.gl/ePLX5h6wr4m1Lq8m9"
         })
+        expect(book.name).toBe('book')
     })
 
-    afterAll(() => {
-        // destructor
+    it('view book', async () => {
+        let book2 = await viewBook(book._id)
+        expect(book2.author._id).toEqual(author._id)
+    })
+    it('search ISBN', async () => {
+        let book2 = await findByISBN(book.ISBN)
+        expect(book2.author._id).toEqual(author._id)
+    })
+    it('search book', async () => {
+        let book = await searchBook({ text: "book", ISBN: "978-1-4028-9462-6", skip: 0 })
+        expect(book.docs[0].name).toBe('book')
+    })
+    it('search book', async () => {
+        let book = await searchBook({ text: "book", skip: 0 })
+        expect(book.docs[0].name).toBe('book')
+    })
+    it('search book', async () => {
+        let book = await searchBook({ ISBN: "978-1-4028-9462-6" })
+        expect(book.docs[0].name).toBe('book')
     })
 
-    beforeEach(() => {
-        number += 10
+    it('search book', async () => {
+        let book = await searchBook({ text: "elefante" })
+        expect(book.docs[0].name).toBe('book')
     })
 
-    it('sum 2 numbers', () => {
-        // expect(sum(5, 7)).not.toBe(12)
-        expect(sum(5, 7)).toBe(12)
-        expect(sum(-5, 7)).toBe(2)
-        expect((number)).toBe(20)
-    })
-
-    it('built in matchers', () => {
-        expect(true).toBe(true)
-        expect(10).toBeGreaterThan(5)
-        expect(NaN).toBeNaN()
-        expect((number)).toBe(30)
-    })
-
-    it('isEven', () => {
-        expect(isEven(2)).toBe(true)
-        const arr = [1, 2, 3, 10, 5]
-        expect(arr).toContain(10)
-        expect(arr).toHaveSize(5)
-    })
-
-    it('custom matcher', () => {
-        expect(20).toBeYoung()
-    })
-
-    it('custom matcher', () => {
-        expect(20).toBe(20)
-    })
-
-    it('get full name', () => {
-        // spyOn(service, 'isEven').and.returnValue(false)
-        const user1 = ['Zaid', 'Hanoun']
-        const user2 = ['Zaid', 'Jamal', 'Hanoun']
-        const user3 = ['Zaid', undefined, 'Hanoun']
-        const user4 = []
-        const user5 = undefined
-
-        expect(fullName(user1)).toBe('Zaid Hanoun')
-        expect(fullName(user2)).toBe('Zaid Jamal Hanoun')
-        expect(fullName(user3)).toBe('Zaid Hanoun')
-        expect(fullName(user4)).toBe('')
-
-        try {
-            fullName(user5)
-        } catch (error) {
-            expect(error.message).toBe('invalid argument')
-        }
-    })
-
-    it('create admin', async () => {
-        admin = await create({
-            email: 'admin@example.com',
-            password: '123',
-            firstName: 'John',
-            lastName: 'Doe',
-            roles: []
+    it('create book no name', async () => {
+        let errorMessage = await createError({
+            ISBN: "978-1-4028-9462-6",
+            author_id: author._id,
+            book_cover_image: "https://images.app.goo.gl/ePLX5h6wr4m1Lq8m9"
         })
-        expect(admin.email).toBe('admin@example.com')
-        expect(admin.password).not.toBe('123')
-        await expectAsync(create({
-            email: 'admin@example.com',
-            password: '123',
-            firstName: 'John',
-            lastName: 'Doe',
-            roles: []
-        })).toBeRejected()
-        // try {
-        //     await 
-        // } catch (err) {
-        //     expect(err.message).toBe('E11000 duplicate key error dup key: { : "admin@example.com" }')
-        // }
+        expect(errorMessage).toBe('Book validation failed: name: Path `name` is required.');
     })
 
-    it('find admin by id', async () => {
-        const db_admin = await findById(admin._id)
-        expect(db_admin.email).toBe('admin@example.com')
-        expect(db_admin.password).not.toBe('123')
-        expect(db_admin.fullName).toBe('John Doe')
+    it('create book duplicated ISBN', async () => {
+        let errorMessage = await createError({
+            name: "book",
+            ISBN: book.ISBN,
+            author_id: author._id,
+            book_cover_image: "https://images.app.goo.gl/ePLX5h6wr4m1Lq8m9"
+        })
+        expect(errorMessage).toBe(`E11000 duplicate key error dup key: { : "${book.ISBN}" }`);
+
     })
-})*/
+
+    it('create book invalid mongo Id', async () => {
+        let AuthId = "123"
+        let errorMessage = await createError({
+            name: "book",
+            ISBN: "978-1-4028-9462-6",
+            author_id: AuthId,
+            book_cover_image: "https://images.app.goo.gl/ePLX5h6wr4m1Lq8m9"
+        })
+        expect(errorMessage).toBe(`Cast to ObjectId failed for value "${AuthId}" (type string) at path "_id" for model "Auth"`);
+    })
+
+    it('create book invalid author', async () => {
+        let AuthId = "627cc9be6b2345582061294d"
+        let errorMessage = await createError({
+            name: "book",
+            ISBN: "978-1-4028-9462-6",
+            author_id: AuthId,
+            book_cover_image: "https://images.app.goo.gl/ePLX5h6wr4m1Lq8m9"
+        })
+        expect(errorMessage).toBe('Author not Found');
+    })
+
+})
