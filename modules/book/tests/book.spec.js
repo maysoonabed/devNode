@@ -1,4 +1,4 @@
-import { sum, isEven, fullName, create, findById } from "../service.js"
+/*import { sum, isEven, fullName, create, findById } from "../service.js"
 import { connect } from '../../../core/mongoMemoryServer.js'
 
 describe('admin tests', () => {
@@ -55,6 +55,10 @@ describe('admin tests', () => {
         expect(20).toBeYoung()
     })
 
+    it('custom matcher', () => {
+        expect(20).toBe(20)
+    })
+
     it('get full name', () => {
         // spyOn(service, 'isEven').and.returnValue(false)
         const user1 = ['Zaid', 'Hanoun']
@@ -105,4 +109,4 @@ describe('admin tests', () => {
         expect(db_admin.password).not.toBe('123')
         expect(db_admin.fullName).toBe('John Doe')
     })
-})
+})*/
