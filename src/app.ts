@@ -5,7 +5,6 @@ import userRouter from './modules/user/routes'
 import responseTime from 'response-time'
 import { IReq } from './interfaces/IRequest'
 import { Methods, RLog } from './interfaces/ILog'
-import { createLog } from './middlewares/addLog'
 import { createBullBoard } from '@bull-board/api'
 import { BullAdapter } from '@bull-board/api/bullAdapter.js'
 import { ExpressAdapter } from '@bull-board/express'
@@ -13,16 +12,14 @@ import logQueue from './queues/logs'
 
 connect().then(() => {
     const app = express();
-    const port: number = 3100;
+    const port: number = 3000;
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
     app.use(responseTime(async (req: IReq, res, time) => {
-        try {
-            const reqLog: RLog = { who: req.userId, method: Methods[req.method], how: res.statusCode, responseTime: time, what: req.headers.host + req.url }
-            const log = await createLog(reqLog)
-            console.log(log)
-        } catch (error) {
-            throw new Error(error)
+        let fullURL = req.protocol + '://' + req.get('host') + req.originalUrl
+        const reqLog: RLog = { who: req.userId, method: Methods[req.method], how: res.statusCode, responseTime: time, what: fullURL }
+        if (!fullURL.includes('queue')) {
+            logQueue.add(reqLog)
         }
     }))
     app.use('/users', userRouter)
@@ -43,8 +40,8 @@ connect().then(() => {
         })
     })
 
-    serverAdapter.setBasePath('/admin/queues')
-    app.use('/admin/queues', serverAdapter.getRouter())
+    serverAdapter.setBasePath('/admin/queue')
+    app.use('/admin/queue', serverAdapter.getRouter())
 
     app.listen(port, () => {
         console.log(`app is listening at port ${port}`)
