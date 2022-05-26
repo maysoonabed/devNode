@@ -1,13 +1,9 @@
 import mongoose from 'mongoose'
 import { ILog } from '../interfaces/ILog'
 
-const options = {
-    discriminatorKey: 'type',
-    collection: 'AuditLog',
-    timestamps: { createdAt: true, updatedAt: false }
-}
 
-const schemaUser = new mongoose.Schema < ILog > ({
+
+const schemaLog = new mongoose.Schema < ILog > ({
     what: String,
     method: {
         type: String,
@@ -20,8 +16,8 @@ const schemaUser = new mongoose.Schema < ILog > ({
     who: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     how: Number,
     responseTime: Number
-}, options)
+}, { timestamps: { createdAt: true, updatedAt: false } })
 
 
 
-export default mongoose.model < ILog > ('AuditLog', schemaUser)
+export default mongoose.model < ILog > ('AuditLog', schemaLog)
