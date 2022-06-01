@@ -9,6 +9,7 @@ import path from 'path'
 import { IUser, RUser } from '../../interfaces/IUser'
 import { IRem, RRem } from '../../interfaces/IRem'
 import Opts from '../../interfaces/opts'
+import { createReminder, removeRepaetedReminder } from '../../middlewares/reminderFunctions'
 
 import { ApiError } from '../../errors/ApiError'
 import reminder from '../../queues/reminder'
@@ -52,28 +53,13 @@ export const findByEmail = async (email): Promise < IUser | undefined > => {
     return await User.findOne({ email })
 }
 
-export const createReminder = async ({ user, subject, text, jobId, repeated, interval, dunno, endDate = null }): Promise < IRem > => {
-    let opts: Opts = {
-        jobId,
-        repeat: {
-            every: milliseconds.minutes(interval),
-            limit: repeated
-        }
-    }
-
-    if (dunno == 'Before')
-        opts.repeat.endDate = endDate
-    const rem: IRem = await Reminder.create({ name: subject, to: user._id, dunno, repeated, interval })
-    reminder.add({ email: user.email, subject, text }, opts)
-    return reminder
-}
 
 export const activate = async (id) => {
     const updated = await User.findOneAndUpdate({ _id: id }, { activated: true })
     if (updated) {
-        const repeatableJobs = await reminder.getRepeatableJobs();
-        const jobWithId = repeatableJobs.filter(job => job.id == 'activate' + updated.email)[0]
-        if (jobWithId) reminder.removeRepeatableByKey(jobWithId.key);
+
+        await removeRepaetedReminder('activate' + updated.email)
+
     }
     return updated
 }
