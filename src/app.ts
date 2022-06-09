@@ -5,10 +5,8 @@ import userRouter from './modules/user/routes'
 import responseTime from 'response-time'
 import { IReq } from './interfaces/IRequest'
 import { Methods, RLog } from './interfaces/ILog'
-import { createBullBoard } from '@bull-board/api'
-import { BullAdapter } from '@bull-board/api/bullAdapter.js'
-import { ExpressAdapter } from '@bull-board/express'
-import reminder from './queues/reminder'
+
+//import reminder from './queues/reminder'
 
 
 connect().then(async () => {
@@ -19,11 +17,6 @@ connect().then(async () => {
 
     app.use('/users', userRouter)
 
-    const serverAdapter = new ExpressAdapter();
-    createBullBoard({
-        queues: [new BullAdapter(reminder)],
-        serverAdapter: serverAdapter,
-    })
 
     app.use((err, req, res, next) => {
         if (err instanceof ApiError) {
@@ -34,9 +27,6 @@ connect().then(async () => {
             message: 'Something broke!'
         })
     })
-
-    serverAdapter.setBasePath('/admin/queue')
-    app.use('/admin/queue', serverAdapter.getRouter())
 
     app.listen(port, () => {
         console.log(`app is listening at port ${port}`)

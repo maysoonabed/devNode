@@ -2,22 +2,20 @@ import Reminder from '../models/Reminder'
 import Opts from '../interfaces/opts'
 import reminder from '../queues/reminder'
 import milliseconds from "milliseconds"
-import { IRem } from '../interfaces/IRem'
 
 
-export const createReminder = async ({ user, subject, text, jobId, repeated, interval, dunno, endDate = null }): Promise < IRem > => {
-    let opts: Opts = {
-        jobId,
-        repeat: {
-            every: milliseconds.minutes(interval),
-            limit: repeated
-        }
+export const createReminder = async ({ user, subject, text, jobId, repeated, interval, dunno, endDate = null, obj = null }) => {
+    let nextRun
+    endDate = new Date(endDate)
+    if (dunno == 'After') {
+        nextRun = new Date(new Date().getTime() + interval * 60000)
+    } else {
+        nextRun = new Date(endDate.getTime() - (interval * repeated * 60000))
+
+        console.log(nextRun)
     }
-    if (dunno == 'Before')
-        opts.repeat.endDate = endDate
-    const rem: IRem = await Reminder.create({ name: subject, to: user._id, dunno, repeated, interval })
-    reminder.add({ email: user.email, subject, text }, opts)
-    return reminder
+    const rem = await Reminder.create({ name: subject, user: user, limit: repeated, interval, nextRun, text, obj })
+
 }
 
 export const removeRepaetedReminder = async (id) => {

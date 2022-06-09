@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
-import { IRem } from '../interfaces/IRem'
+import { schemaUser } from './User'
+import { schemaInterview } from './Interview'
 
-const schemaReminder = new mongoose.Schema < IRem > ({
+const schemaReminder = new mongoose.Schema({
     name: { type: String, required: true },
-    to: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    text: String,
     dunno: {
         type: String,
         enum: ["Before",
@@ -11,8 +12,14 @@ const schemaReminder = new mongoose.Schema < IRem > ({
         ]
     },
     interval: Number,
-    repeated: Number
-
+    user: schemaUser,
+    limit: Number,
+    count: {
+        type: Number,
+        default: 0,
+    },
+    nextRun: Date,
+    obj: schemaInterview
 }, { timestamps: true })
 
-export default mongoose.model < IRem > ('Reminder', schemaReminder)
+export default mongoose.model('Reminder', schemaReminder)

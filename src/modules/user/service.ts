@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken'
 import fs from 'fs'
 import path from 'path'
 import { IUser, RUser } from '../../interfaces/IUser'
-import { IRem, RRem } from '../../interfaces/IRem'
 import Opts from '../../interfaces/opts'
 import { createReminder, removeRepaetedReminder } from '../../middlewares/reminderFunctions'
 
@@ -29,7 +28,7 @@ export const create = async (reqUser: RUser): Promise < IUser > => {
         const subject = 'Registration Process'
         const text = 'Please Complete the Registration Process'
         const jobId = 'activate' + user.email
-        const rem: IRem = await createReminder({ user: user, dunno: 'After', subject, text, jobId, repeated: 3, interval: 1 })
+        const rem = await createReminder({ user: user, dunno: 'After', subject, text, jobId, repeated: 3, interval: 1 })
 
     }
     return user
@@ -55,12 +54,9 @@ export const findByEmail = async (email): Promise < IUser | undefined > => {
 
 
 export const activate = async (id) => {
+    const user = await User.findById(id)
+    const remi = Reminder.findOneAndDelete({ user: user, name: 'Registration Process' })
     const updated = await User.findOneAndUpdate({ _id: id }, { activated: true })
-    if (updated) {
-
-        await removeRepaetedReminder('activate' + updated.email)
-
-    }
     return updated
 }
 
@@ -71,7 +67,7 @@ export const addInterview = async ({ name, dateTime, userId }) => {
         const subject = 'Interview Reminder'
         const text = `You Are Having An Interview ${name} at ${dateTime}`
         const jobId = name + user.email
-        const rem: IRem = await createReminder({ user: user, dunno: 'Before', subject, text, jobId, repeated: 3, interval: 1, endDate: dateTime })
+        const rem = await createReminder({ user: user, dunno: 'Before', subject, text, jobId, repeated: 3, interval: 1, endDate: dateTime, obj: interview })
     }
     return interview
 }

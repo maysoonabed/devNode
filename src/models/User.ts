@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import { IUser } from '../interfaces/IUser'
 
-const schemaUser = new mongoose.Schema < IUser > ({
+export const schemaUser = new mongoose.Schema < IUser > ({
     email: { type: String, required: true, unique: true }, //
     password: { type: String, required: true },
     activated: { type: Boolean, default: false },

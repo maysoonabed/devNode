@@ -1,6 +1,7 @@
 export const connection = {
     redis: {
         host: 'localhost',
-        port: 6379
+        port: 6379,
+        legacyMode: true
     }
 }
