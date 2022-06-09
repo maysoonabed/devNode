@@ -33,58 +33,6 @@ export const find = async (req, res) => {
     return res.send(users)
 }
 
-export const findUserLikes = async (req, res) => {
-    const result = await User.aggregate([{
-            $match: {
-                _id: new mongoose.Types.ObjectId(req.userId)
-            }
-        },
-        {
-            $project: {
-                password: 0
-            }
-        },
-        {
-            $lookup: {
-                from: 'likes',
-                localField: '_id',
-                foreignField: 'user_id',
-                as: 'like'
-            }
-        },
-        // {
-        //     $addFields: {
-        //         count: { $size: "$like" }
-        //     }
-        // },
-        {
-            $unwind: '$like'
-        },
-        {
-            $lookup: {
-                from: 'contents',
-                localField: 'like.post_id',
-                foreignField: '_id',
-                as: 'post'
-            }
-        },
-        {
-            $unwind: '$post'
-        },
-        {
-            $project: {
-                'like.post_id': 0,
-                'like.user_id': 0,
-                'like.__v': 0,
-                'post.__v': 0
-            }
-        },
-        {
-            $count: 'count'
-        }
-    ])
-    return res.send(result)
-}
 
 export const findById = async (req, res) => {
     const user = await User.findOne({ _id: req.params.id }).lean()
@@ -106,25 +54,4 @@ export const remove = async (req, res) => {
     }
     await user.delete()
     res.status(204).send()
-}
-
-
-export const activate = async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
-    const id = req.params.id
-    try {
-        const user = await service.activate(id)
-        res.send(user)
-    } catch (error) {
-        next(error)
-    }
-}
-
-export const addInterview = async (req: IReq, res: Express.Response, next: Express.NextFunction) => {
-    const { name, dateTime } = req.body
-    try {
-        const interview = await service.addInterview({ name, dateTime, userId: req.userId })
-        res.send(interview)
-    } catch (error) {
-        next(error)
-    }
 }

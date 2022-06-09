@@ -3,8 +3,6 @@ import connect from './core/db'
 import { ApiError } from './errors/ApiError'
 import userRouter from './modules/user/routes'
 import responseTime from 'response-time'
-import { IReq } from './interfaces/IRequest'
-import { Methods, RLog } from './interfaces/ILog'
 
 //import reminder from './queues/reminder'
 
