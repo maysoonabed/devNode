@@ -1,6 +1,5 @@
 class ApiError {
-    constructor(public code: number, public message: string) {
-    }
+    constructor(public code: number, public message: string) {}
 
     static badRequest(message: string): ApiError {
         return new ApiError(400, message)
@@ -9,7 +8,9 @@ class ApiError {
     static serverError(message: string): ApiError {
         return new ApiError(500, message)
     }
-
+    static notFound(message) {
+        return new ApiError(404, message)
+    }
     static duplicate(message: string): ApiError {
         return new ApiError(409, message)
     }

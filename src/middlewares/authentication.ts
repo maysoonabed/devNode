@@ -19,6 +19,7 @@ export default async (req: IReq, res, next) => {
         const payload = validateToken(token)
         if (payload) {
             req.userId = payload._id
+            req.userEmail = payload.email
             return next()
         }
     } catch (e) {

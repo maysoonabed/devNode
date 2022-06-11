@@ -50,4 +50,4 @@ schemaUser.pre('updateOne', function() {
     // next()
 })
 
-export default mongoose.model < IUser > ('ser', schemaUser)
+export default mongoose.model < IUser > ('User', schemaUser)

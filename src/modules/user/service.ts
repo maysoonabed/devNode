@@ -35,3 +35,9 @@ export const login = async ({ email, password }) => {
 export const findByEmail = async (email): Promise < IUser | undefined > => {
     return await User.findOne({ email })
 }
+
+export const findById = async (id: string): Promise < IUser > => {
+    const user: IUser = await User.findById(id)
+    if (!user) throw ApiError.notFound('no user found')
+    return user
+}
