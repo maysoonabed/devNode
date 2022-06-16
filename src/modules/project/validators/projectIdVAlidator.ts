@@ -11,7 +11,7 @@ const rules = [
         req.workflow = available.workflow
         req.projectId = priject_id
         return true
-    })
+    }).withMessage('the Project is not available')
 ]
 
 export default validate(rules)

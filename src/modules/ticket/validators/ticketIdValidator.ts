@@ -12,7 +12,7 @@ const rules = [
         req.ticketId = ticket_id
 
         return true
-    })
+    }).withMessage(`the Ticket is not available`)
 ]
 
 export default validate(rules)

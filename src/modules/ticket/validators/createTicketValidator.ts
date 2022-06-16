@@ -1,7 +1,7 @@
 import { body } from 'express-validator'
 import validate from '../../../core/errorMiddleware'
 import { findById } from '../service'
-import { findById as findUser } from '../../user/service'
+import { findByEmail as findUser } from '../../user/service'
 
 const rules = [
     body('name')
@@ -19,7 +19,7 @@ const rules = [
         return true
     }),
     body('assignee')
-    .isMongoId().withMessage('user id is not a valid mongo id')
+    .isEmail().withMessage('user email is not a valid email').bail()
     .custom(async value => {
         const user = await findUser(value)
         if (!user) return Promise.reject('user not found')

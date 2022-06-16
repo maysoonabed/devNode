@@ -12,7 +12,7 @@ import { ApiError } from '../../errors/ApiError';
 export const create = async (req: IReq, res: Express.Response, next: Express.NextFunction) => {
     const { name, description, assignee, type, stage, severity, parentTicket } = req.body
     try {
-        const reqTicket: RTicket = { name, userId: req.userId, description, assignee, workflow: req.workflow, type, stage, severity, parentTicket, project: req.projectId }
+        const reqTicket: RTicket = { name, createdBy: req.userEmail, updatedBy: req.userEmail, description, assignee, workflow: req.workflow, type, stage, severity, parentTicket, project: req.projectId }
         const ticket = await service.create(reqTicket)
         res.send(ticket)
     } catch (error) {
@@ -41,10 +41,21 @@ export const find = async (req, res, next) => {
     }
 }
 
+export const advancedSearch = async (req, res, next) => {
+    const { text, skip } = req.query
+    try {
+        const ticket = await service.advancedSearch({ text, skip })
+        return res.send(ticket)
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 
 export const deleteById = async (req, res, next) => {
     try {
-        await service.deleteById({ id: req.params.id, userId: req.userId })
+        await service.deleteById({ id: req.params.id, userEmail: req.userEmail })
         return res.status(204).send('ticket deleted successfully')
     } catch (error) {
         next(error)
@@ -53,11 +64,32 @@ export const deleteById = async (req, res, next) => {
 }
 
 
+
+
 export const update = async (req, res, next) => {
-    const { name, description, assignee, type, stage, severity } = req.body
+    const { name, description, assignee, stage, severity } = req.body
     try {
-        const ticket = await service.update({ id: req.params.id, userId: req.userId, name, description, assignee, type, stage, severity })
+        const ticket = await service.update({ id: req.params.id, updatedBy: req.userEmail, name, description, assignee, stage, severity })
         return res.send(ticket)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const updateStage = async (req, res, next) => {
+    const { stage } = req.body
+    try {
+        const ticket = await service.updateStage({ id: req.params.id, updatedBy: req.userEmail, stage })
+        return res.send(ticket)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const groupStage = async (req, res, next) => {
+    try {
+        const results = await service.groupStage(req.params.skip)
+        return res.send(results)
     } catch (error) {
         next(error)
     }

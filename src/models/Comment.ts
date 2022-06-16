@@ -12,5 +12,4 @@ export const schemaComment = new mongoose.Schema < IComment > ({
 
 schemaComment.plugin(MongooseDelete, { deletedAt: true, deletedBy: true });
 
-
 export default mongoose.model < IComment, MongooseDelete.SoftDeleteModel < IComment > > ('Comment', schemaComment)
