@@ -62,9 +62,9 @@ export const searchTicket = async ({ text, stage, type, assignee, project, limit
 
 }
 
-export const advancedSearch = async ({ text, skip = 0 }) => {
+export const advancedSearch = async ({ text, skip = 0, projectId }) => {
     const fields = ["assignee_info.fullName", "name", "description", "comments.content"]
-    return await advanceSearch('tickets', skip, text, fields)
+    return await advanceSearch('tickets', skip, text, fields, projectId)
 
 }
 export const deleteById = async ({ id, userEmail }) => {
@@ -79,8 +79,7 @@ export const deleteById = async ({ id, userEmail }) => {
         await deleteQuery(query, 'tickets')
     } catch (err) {
         if (!err.message.includes('Query was already executed'))
-            console.log(err.message)
-        throw ApiError.serverError(err.message)
+            throw ApiError.serverError(err.message)
     }
     logger.info(`Ticket ${id} and its subtickets were deleted by ${userEmail}`)
 
@@ -182,7 +181,7 @@ export const aggregateById = async (id) => {
     return ticket[0]
 }
 
-export const groupStage = async (skip: number = 0) => {
-    const res = await groupBy('tickets', skip);
+export const groupStage = async (skip: number = 0, projectId) => {
+    const res = await groupBy('tickets', skip, projectId);
     return res
 }

@@ -44,7 +44,7 @@ export const find = async (req, res, next) => {
 export const advancedSearch = async (req, res, next) => {
     const { text, skip } = req.query
     try {
-        const ticket = await service.advancedSearch({ text, skip })
+        const ticket = await service.advancedSearch({ text, skip, projectId: req.projectId })
         return res.send(ticket)
     } catch (error) {
         next(error)
@@ -88,7 +88,7 @@ export const updateStage = async (req, res, next) => {
 
 export const groupStage = async (req, res, next) => {
     try {
-        const results = await service.groupStage(req.params.skip)
+        const results = await service.groupStage(req.params.skip, req.projectId)
         return res.send(results)
     } catch (error) {
         next(error)
