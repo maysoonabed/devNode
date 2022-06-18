@@ -63,10 +63,10 @@ schemaUser.post("save", async function (doc, next) {
   if (this.$locals.isNew) {
     //
   }
-  const copy = JSON.parse(JSON.stringify(doc));
-  delete copy._id;
-  delete copy.__v;
-  await index(doc._id, "user", copy);
+  // const copy = JSON.parse(JSON.stringify(doc));
+  // delete copy._id;
+  // delete copy.__v;
+  // await index(doc._id, "user", copy);
   next();
 });
 
@@ -78,8 +78,8 @@ schemaUser.pre("remove", function (doc, next) {
 
 schemaUser.pre("find", function () {
   // send doc to elasticsearch
-  this.setQuery({ deleted: false });
-  console.log(this.getQuery());
+  // this.setQuery({ deleted: false });
+  // console.log(this.getQuery());
   // this.delete = false
   // next()
 });
@@ -97,4 +97,35 @@ schemaUser.pre("updateOne", function () {
   next();
 });
 
-export default mongoose.model("User", schemaUser);
+const model = mongoose.model("User", schemaUser);
+
+model
+  .watch(
+    [
+      {
+        $match: {
+          $and: [
+            { "updateDescription.updatedFields.email": { $exists: true } },
+            { operationType: "update" },
+          ],
+        },
+      },
+    ],
+    {
+      fullDocument: "updateLookup",
+    }
+  )
+  .on("change", async (data) => {
+    const { fullDocument, documentKey, operationType } = data;
+    switch (operationType) {
+      case "update":
+      case "insert":
+        delete fullDocument._id;
+        const result = await index(documentKey._id, "user", fullDocument);
+        console.log(result);
+        break;
+    }
+    console.log(data);
+  });
+
+export default model;

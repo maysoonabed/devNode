@@ -2,8 +2,8 @@ import User from "../../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import fs from "fs";
-import emailQueue from "../../queues/emails.js";
-import fibonacciQueue from "../../queues/cpu-intensive-task.js";
+// import emailQueue from "../../queues/emails.js";
+// import fibonacciQueue from "../../queues/cpu-intensive-task.js";
 
 export const create = async ({ email, password, firstName, lastName }) => {
   const hash = await bcrypt.hash(password, 3);
@@ -14,8 +14,8 @@ export const create = async ({ email, password, firstName, lastName }) => {
     lastName,
   });
   const obj = { user, emailTemplate: "" };
-  emailQueue.add(obj);
-  fibonacciQueue.add(8);
+  // emailQueue.add(obj);
+  // fibonacciQueue.add(8);
   return user;
 };
 
