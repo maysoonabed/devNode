@@ -10,6 +10,6 @@ export const schemaComment = new mongoose.Schema < IComment > ({
 }, { timestamps: true })
 
 
-schemaComment.plugin(MongooseDelete, { deletedAt: true, deletedBy: true });
+schemaComment.plugin(MongooseDelete, { deletedAt: true, deletedBy: true, deletedByType: String });
 
 export default mongoose.model < IComment, MongooseDelete.SoftDeleteModel < IComment > > ('Comment', schemaComment)

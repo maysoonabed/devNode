@@ -7,7 +7,7 @@ const rules = [
     .isMongoId().withMessage('Ticket Id is not a valid mongo id')
     .custom(async (ticket_id, { req }) => {
         const available = await findById(ticket_id)
-        if (!available) return Promise.reject('the Ticket is not available')
+        if (!available || (req.projectId && req.projectId != available.project)) return Promise.reject('the Ticket is not available')
         req.workflow = available.workflow
         req.ticketId = ticket_id
 

@@ -34,7 +34,7 @@ export const findById = async (req, res, next) => {
 
 export const deleteById = async (req, res, next) => {
     try {
-        await service.deleteById(req.params.id)
+        await service.deleteById(req.params.id, req.ticketId, req.userEmail)
         return res.status(204).send("Comment deleted successfully")
     } catch (error) {
         next(error)

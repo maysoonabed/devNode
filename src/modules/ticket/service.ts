@@ -2,15 +2,11 @@ import Ticket from '../../models/Ticket'
 import Story from '../../models/Story'
 import Bug from '../../models/Bug'
 
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import fs from 'fs'
-import path from 'path'
 import { ITicket, RTicket } from '../../interfaces/ITicket'
 import { ApiError } from '../../errors/ApiError'
 import { ObjectId } from 'mongoose'
 import { logger } from '../../middlewares/logger'
-import { groupBy, advanceSearch, deleteQuery } from '../../utils/elastic'
+import { groupBy, advanceSearch } from '../../utils/elastic'
 
 
 type Updates = {
@@ -64,19 +60,12 @@ export const searchTicket = async ({ text, stage, type, assignee, project, limit
 
 export const advancedSearch = async ({ text, skip = 0, projectId }) => {
     const fields = ["assignee_info.fullName", "name", "description", "comments.content"]
-    return await advanceSearch('tickets', skip, text, fields, projectId)
+    return await advanceSearch('ticket', skip, text, fields, projectId)
 
 }
 export const deleteById = async ({ id, userEmail }) => {
     try {
         await Ticket.delete({ $or: [{ _id: id }, { parentTicket: id }] }, userEmail);
-        const query = {
-            multi_match: {
-                "query": id,
-                "fields": ["_id", "parentTicket"]
-            }
-        }
-        await deleteQuery(query, 'tickets')
     } catch (err) {
         if (!err.message.includes('Query was already executed'))
             throw ApiError.serverError(err.message)
@@ -101,6 +90,7 @@ export const update = async ({ id, updatedBy, name, description, assignee, stage
         const ticket: ITicket = await Ticket.findOneAndUpdate({ _id: id }, updates, { new: true })
         return ticket
     } catch (err) {
+        console.log(err)
         throw ApiError.serverError('could not update the ticket')
     }
 }
@@ -182,6 +172,6 @@ export const aggregateById = async (id) => {
 }
 
 export const groupStage = async (skip: number = 0, projectId) => {
-    const res = await groupBy('tickets', skip, projectId);
+    const res = await groupBy('ticket', skip, projectId);
     return res
 }

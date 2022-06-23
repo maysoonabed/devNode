@@ -1,11 +1,12 @@
 import mongoose from 'mongoose'
+import { setTimeout } from 'timers/promises'
 import { ITicket } from '../interfaces/ITicket'
 import MongooseDelete from 'mongoose-delete'
-import { logger } from '../middlewares/logger'
 import util from 'util'
-import { index, updateDocument } from '../utils/elastic'
+import { index } from '../utils/elastic'
 import { aggregateById } from '../modules/ticket/service'
 import { schemaComment } from './Comment'
+import { logger } from '../middlewares/logger'
 
 const options = {
     discriminatorKey: 'type',
@@ -33,16 +34,14 @@ schemaTicket.index({ name: 'text', description: 'text' })
 
 schemaTicket.plugin(MongooseDelete, { deletedAt: true, deletedBy: true, deletedByType: String });
 
+
 schemaTicket.post('save', async function(doc) {
     logger.info(`A new ${doc.type} was created by ${doc.createdBy}`, { timestamp: doc.updatedAt });
-    const clone = await aggregateById(doc._id)
-    await index(doc._id, 'tickets', clone);
+
 })
 
 schemaTicket.post('findOneAndUpdate', async function(doc) {
     const clone = await aggregateById(doc._id)
-    await updateDocument(doc._id, 'tickets', clone);
-
     const modifiedFields = this.getUpdate();
     delete modifiedFields['$set']['updatedAt'];
     delete modifiedFields['$set']['updatedBy'];
@@ -55,4 +54,23 @@ schemaTicket.pre('find', function() {
 });
 const Ticket = mongoose.model < ITicket,
     MongooseDelete.SoftDeleteModel < ITicket > > ('Ticket', schemaTicket)
+
+
+const changeStreamCursor = Ticket.watch(
+        [ /*{  '$match': { 'operationType': { $in: ['insert', 'update'] }, },}*/ ], {
+            fullDocument: "updateLookup",
+        }
+    )
+    .on("change", async (data) => {
+        const { fullDocument, documentKey, operationType } = data;
+        switch (operationType) {
+            case "update":
+            case "insert":
+                const clone = await aggregateById(fullDocument._id)
+                const result = await index(documentKey._id, "ticket", clone);
+                console.log(result);
+                break;
+        }
+    });
+
 export default Ticket

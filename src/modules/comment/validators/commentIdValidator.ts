@@ -7,7 +7,7 @@ const rules = [
     .isMongoId().withMessage('Comment Id is not a valid mongo id')
     .custom(async (comment_id, { req }) => {
         const available = await findById(comment_id)
-        if (!available) return Promise.reject('the comment is not available')
+        if (!available || available.ticketId != req.ticketId) return Promise.reject('the comment is not available')
         return true
     })
 ]

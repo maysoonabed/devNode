@@ -17,15 +17,23 @@ export const groupBy = async (index, skip, projectId) => {
         index,
         body: {
             "query": {
-                "match": {
-                    "project_info._id": {
-                        query: projectId
-                    }
+                "bool": {
+                    "must": [{
+                        "match": {
+                            "deleted": "false"
+                        }
+                    }, {
+
+                        "match": {
+                            "project_info._id": projectId
+                        }
+                    }]
+
                 }
             },
             "aggs": {
                 "stages": {
-                    "terms": { "field": "stage" }
+                    "terms": { "field": "stage.keyword" }
                 }
             }
         }
@@ -36,20 +44,25 @@ export const advanceSearch = async (index, skip, text, fields, projectId) => {
 
     return await client.search({
         from: skip,
-        size: 10,
+      size: 10,
         index,
         body: {
-
             "query": {
                 "bool": {
                     "must": [{
                             "match": {
+                                "deleted": "false"
+                            }
+                        },
+                        {
+                            "match": {
                                 "project_info._id": projectId
                             }
                         },
+
                         text ? {
                             "query_string": {
-                                "query": text || "",
+                                "query": text,
                                 "fuzziness": "auto",
                                 "fields": fields
                             }
