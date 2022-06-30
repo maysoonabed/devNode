@@ -39,7 +39,7 @@ connect().then(() => {
     })
 
     process.on('uncaughtException', function(err) {
-  
+
         // Handle the error safely
         console.log(err)
         process.exit(0)
