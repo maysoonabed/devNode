@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "test": "TEST_RUNNING=true node_modules/.bin/jasmine",
-    "start": "nodemon server.js",
+    "start": "nodemon --legacy-watch server.js",
     "seed": "node seeder.js",
     "reindex": "node reindex.js"
   },

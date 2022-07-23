@@ -84,12 +84,6 @@ schemaUser.pre("find", function () {
   // next()
 });
 
-schemaUser.post("find", function (doc, next) {
-  // send doc to elasticsearch
-  console.log("pre find has been called");
-  next();
-});
-
 schemaUser.pre("updateOne", function () {
   // send doc to elasticsearch
   this.set({ updatedAt: Date.now() });
@@ -98,34 +92,5 @@ schemaUser.pre("updateOne", function () {
 });
 
 const model = mongoose.model("User", schemaUser);
-
-model
-  .watch(
-    [
-      {
-        $match: {
-          $and: [
-            { "updateDescription.updatedFields.email": { $exists: true } },
-            { operationType: "update" },
-          ],
-        },
-      },
-    ],
-    {
-      fullDocument: "updateLookup",
-    }
-  )
-  .on("change", async (data) => {
-    const { fullDocument, documentKey, operationType } = data;
-    switch (operationType) {
-      case "update":
-      case "insert":
-        delete fullDocument._id;
-        const result = await index(documentKey._id, "user", fullDocument);
-        console.log(result);
-        break;
-    }
-    console.log(data);
-  });
-
+ 
 export default model;
